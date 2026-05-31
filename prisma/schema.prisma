@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum CaseStatus {
+  COLLECTING_INFORMATION
+  WAITING_FOR_RESIDENT
+  READY_FOR_REVIEW
+  ESCALATED
+  IN_PROGRESS
+  CLOSED
+  ARCHIVED
+}
+
+enum FieldType {
+  TEXT
+  NUMBER
+  SELECT
+  BOOLEAN
+}
+
+enum UserRole {
+  ADMIN
+  AGENT
+}
+
+model Company {
+  id           String         @id @default(cuid())
+  name         String
+  intakeEmail  String         @unique // unik adress dit property manager forwarderar
+  createdAt    DateTime       @default(now())
+  users        User[]
+  properties   Property[]
+  categories   IssueCategory[]
+  emailAccount EmailAccount?
+  cases        Case[]
+}
+
+model Property {
+  id        String   @id @default(cuid())
+  name      String
+  address   String
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  cases     Case[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      UserRole @default(AGENT)
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+// OAuth2-tokens för Gmail/Outlook, en per bolag
+model EmailAccount {
+  id           String   @id @default(cuid())
+  companyId    String   @unique
+  company      Company  @relation(fields: [companyId], references: [id])
+  email        String
+  provider     String   // "google" | "microsoft"
+  accessToken  String
+  refreshToken String
+  expiresAt    DateTime
+  updatedAt    DateTime @updatedAt
+}
+
+// Konfigurerbar ärendekategori per bolag
+model IssueCategory {
+  id          String          @id @default(cuid())
+  companyId   String
+  company     Company         @relation(fields: [companyId], references: [id])
+  name        String
+  description String?
+  fields      CategoryField[]
+  cases       Case[]
+}
+
+// Fält som AI ska samla in för en kategori
+model CategoryField {
+  id          String        @id @default(cuid())
+  categoryId  String
+  category    IssueCategory @relation(fields: [categoryId], references: [id])
+  key         String
+  label       String
+  type        FieldType     @default(TEXT)
+  required    Boolean       @default(true)
+  options     String[]      // för SELECT-typ
+  order       Int           @default(0)
+  fieldValues CaseFieldValue[]
+}
+
+model Case {
+  id              String           @id @default(cuid())
+  companyId       String
+  company         Company          @relation(fields: [companyId], references: [id])
+  propertyId      String?
+  property        Property?        @relation(fields: [propertyId], references: [id])
+  categoryId      String?
+  category        IssueCategory?   @relation(fields: [categoryId], references: [id])
+  status          CaseStatus       @default(COLLECTING_INFORMATION)
+  residentEmail   String
+  residentName    String?
+  subject         String
+  emailThreadId   String?          // för att matcha svar till rätt ärende
+  summary         String?          // AI-genererad sammanfattning när klart
+  escalationNote  String?
+  lastResidentAt  DateTime?        // senast hyresgästen svarade
+  waitingSince    DateTime?        // när vi började vänta
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  messages        Message[]
+  fieldValues     CaseFieldValue[]
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  caseId      String
+  case        Case     @relation(fields: [caseId], references: [id])
+  fromResident Boolean  // true = från hyresgäst, false = från AI/handläggare
+  body        String
+  emailId     String?  // externt mail-ID
+  sentAt      DateTime @default(now())
+}
+
+// Insamlade fältvärden per ärende
+model CaseFieldValue {
+  id        String        @id @default(cuid())
+  caseId    String
+  case      Case          @relation(fields: [caseId], references: [id])
+  fieldId   String
+  field     CategoryField @relation(fields: [fieldId], references: [id])
+  value     String
+  updatedAt DateTime      @updatedAt
+
+  @@unique([caseId, fieldId])
+}
