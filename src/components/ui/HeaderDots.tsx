@@ -8,8 +8,8 @@ export function HeaderDots() {
     >
       <defs>
         {/* Mikroprick-pattern: 0.1px radius, 0.55px spacing */}
-        <pattern id="pd" x="0" y="0" width="0.8" height="0.8" patternUnits="userSpaceOnUse">
-          <circle cx="0.4" cy="0.4" r="0.25" fill="#3b82f6" />
+        <pattern id="pd" x="0" y="0" width="1.1" height="1.1" patternUnits="userSpaceOnUse">
+          <circle cx="0.55" cy="0.55" r="0.4" fill="#3b82f6" />
         </pattern>
 
         {/* Nav-mask: tät mitt (88%, 50%), tonar ut mot kanterna */}
