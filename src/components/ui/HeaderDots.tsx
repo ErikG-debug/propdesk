@@ -8,7 +8,7 @@ function seededRandom(seed: number) {
 
 function generateDots(W: number, H: number, focalX: number, focalY: number, sigma: number) {
   const rand = seededRandom(42);
-  const step = 4;
+  const step = 2;
   const dots: { x: number; y: number; r: number }[] = [];
 
   for (let gx = 0; gx <= W; gx += step) {
@@ -18,10 +18,10 @@ function generateDots(W: number, H: number, focalX: number, focalY: number, sigm
       const prob = Math.exp(-(dx * dx + dy * dy) / (2 * sigma * sigma));
 
       if (rand() < prob) {
-        const x = gx + (rand() - 0.5) * step * 0.7;
-        const y = gy + (rand() - 0.5) * step * 0.7;
-        // Lite större prickar i glesa kanten så dom syns tydligare
-        const r = prob < 0.25 ? 2.5 : 2;
+        const x = gx + (rand() - 0.5) * step * 0.6;
+        const y = gy + (rand() - 0.5) * step * 0.6;
+        // Lite större prickar ute i glesa kanten så dom syns tydligare
+        const r = prob < 0.2 ? 1.8 : 1.2;
         dots.push({
           x: Math.round(x * 10) / 10,
           y: Math.round(y * 10) / 10,
