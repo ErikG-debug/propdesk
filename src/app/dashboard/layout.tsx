@@ -5,7 +5,7 @@ import { HeaderDots } from "@/components/ui/HeaderDots";
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <header className="relative z-10 overflow-hidden border-b border-gray-200 bg-white">
+      <header className="relative z-10 overflow-hidden border-b border-[#0a1a2a] bg-[#04090f]">
         <HeaderDots />
         <div className="relative mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <Link href="/dashboard" aria-label="PropDesk" className="block h-7 w-32" />
