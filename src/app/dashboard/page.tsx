@@ -69,7 +69,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="bg-gradient-to-r from-blue-700 to-indigo-500 bg-clip-text text-2xl font-bold text-transparent">
+        <h1 className="bg-gradient-to-r from-[#1a6ba8] to-[#1a4f8a] bg-clip-text text-2xl font-bold text-transparent">
           Ärenden
         </h1>
         <span className="text-sm text-gray-400">{cases.length} ärenden</span>
@@ -91,8 +91,8 @@ export default async function DashboardPage({ searchParams }: PageProps) {
               href={tab.value === "ALL" ? "/dashboard" : `/dashboard?filter=${tab.value}`}
               className={`flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition ${
                 isActive
-                  ? "border-blue-600 text-blue-700"
-                  : "border-transparent text-gray-500 hover:text-blue-500"
+                  ? "border-[#1a6ba8] text-[#1a6ba8]"
+                  : "border-transparent text-gray-500 hover:text-[#1a6ba8]"
               }`}
             >
               {tab.label}

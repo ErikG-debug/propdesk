@@ -80,7 +80,7 @@ export function HeaderDots() {
         </defs>
         <g clipPath="url(#propdesk-clip)">
           {LOGO_DOTS.map((d, i) => (
-            <circle key={i} cx={d.x} cy={d.y} r={0.9} fill="#3b82f6" />
+            <circle key={i} cx={d.x} cy={d.y} r={0.9} fill="#1a6ba8" />
           ))}
         </g>
       </svg>
@@ -93,7 +93,7 @@ export function HeaderDots() {
         preserveAspectRatio="xMaxYMid slice"
       >
         {NAV_DOTS.map((d, i) => (
-          <circle key={i} cx={d.x} cy={d.y} r={0.6} fill="#3b82f6" />
+          <circle key={i} cx={d.x} cy={d.y} r={0.6} fill="#1a6ba8" />
         ))}
       </svg>
     </>
