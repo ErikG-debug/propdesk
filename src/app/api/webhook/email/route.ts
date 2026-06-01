@@ -6,12 +6,15 @@ import crypto from "crypto";
 // Postmark skickar ett X-Postmark-Signature header som vi verifierar
 function verifyPostmarkWebhook(body: string, signature: string): boolean {
   const secret = process.env.POSTMARK_WEBHOOK_SECRET;
-  if (!secret) return false;
+  if (!secret || !signature) return false;
   const expected = crypto
     .createHmac("sha256", secret)
     .update(body)
     .digest("base64");
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  const expectedBuf = Buffer.from(expected);
+  const sigBuf = Buffer.from(signature);
+  if (expectedBuf.length !== sigBuf.length) return false;
+  return crypto.timingSafeEqual(expectedBuf, sigBuf);
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
