@@ -2,39 +2,39 @@ import type { CaseStatus } from "@prisma/client";
 
 const CONFIG: Record<CaseStatus, { label: string; classes: string }> = {
   COLLECTING_INFORMATION: {
-    label: "Samlar information",
-    classes: "bg-blue-100 text-blue-800",
+    label: "Samlar info",
+    classes: "bg-slate-50 text-slate-500 ring-1 ring-slate-200",
   },
   WAITING_FOR_RESIDENT: {
     label: "Väntar på svar",
-    classes: "bg-yellow-100 text-yellow-800",
+    classes: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
   },
   READY_FOR_REVIEW: {
-    label: "Redo för granskning",
-    classes: "bg-green-100 text-green-800",
+    label: "Redo",
+    classes: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
   },
   ESCALATED: {
-    label: "Eskalerat",
-    classes: "bg-red-100 text-red-800",
+    label: "Brådskande",
+    classes: "bg-red-50 text-red-700 ring-1 ring-red-200",
   },
   IN_PROGRESS: {
     label: "Pågående",
-    classes: "bg-purple-100 text-purple-800",
+    classes: "bg-[#1a6ba8]/8 text-[#1a6ba8] ring-1 ring-[#1a6ba8]/25",
   },
   CLOSED: {
     label: "Avslutat",
-    classes: "bg-gray-100 text-gray-600",
+    classes: "bg-gray-50 text-gray-400 ring-1 ring-gray-200",
   },
   ARCHIVED: {
     label: "Arkiverat",
-    classes: "bg-gray-100 text-gray-400",
+    classes: "bg-gray-50 text-gray-300 ring-1 ring-gray-100",
   },
 };
 
 export function StatusBadge({ status }: { status: CaseStatus }) {
   const { label, classes } = CONFIG[status];
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${classes}`}>
+    <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${classes}`}>
       {label}
     </span>
   );

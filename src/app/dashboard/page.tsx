@@ -69,9 +69,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="bg-gradient-to-r from-[#1a6ba8] to-[#1a4f8a] bg-clip-text text-2xl font-bold text-transparent">
-          Ärenden
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-900">Ärenden</h1>
         <span className="text-sm text-gray-400">{cases.length} ärenden</span>
       </div>
 
