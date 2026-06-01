@@ -123,8 +123,11 @@ Returnera ett JSON-objekt med exakt dessa nycklar:
     messages,
   });
 
-  const text =
+  const raw =
     response.content[0].type === "text" ? response.content[0].text : "";
+
+  // Strippa markdown-kodblock om Claude svarar med ```json ... ```
+  const text = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim();
 
   const parsed = JSON.parse(text) as AIAnalysisResult;
   return parsed;

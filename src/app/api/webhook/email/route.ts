@@ -29,13 +29,23 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Ogiltigt JSON" }, { status: 400 });
   }
 
+  const headers = (payload.Headers as { Name: string; Value: string }[]) ?? [];
+  const headerMap = Object.fromEntries(headers.map((h) => [h.Name.toLowerCase(), h.Value]));
+
+  // Postmarks MessageID är deras eget ID — det riktiga Gmail Message-ID finns i Headers
+  const realMessageId =
+    headerMap["message-id"] ??
+    headerMap["x-forwarded-message-id"] ??
+    (payload.MessageID as string) ??
+    "";
+
   const email: InboundEmail = {
     from: (payload.From as string) ?? "",
     to: ((payload.To as string) ?? "").toLowerCase(),
     subject: (payload.Subject as string) ?? "(inget ämne)",
     textBody: (payload.TextBody as string) ?? "",
     htmlBody: (payload.HtmlBody as string | undefined),
-    messageId: (payload.MessageID as string) ?? "",
+    messageId: realMessageId,
     inReplyTo: (payload.InReplyTo as string | undefined),
   };
 
@@ -47,7 +57,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     await processInboundEmail(email);
     return NextResponse.json({ ok: true });
   } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
     console.error("Fel vid bearbetning av inkommande mail:", err);
-    return NextResponse.json({ error: "Internt fel" }, { status: 500 });
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

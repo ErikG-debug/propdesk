@@ -103,17 +103,21 @@ function buildMimeMessage({
   inReplyTo?: string;
   references?: string;
 }): string {
+  // Koda subject med RFC 2047 base64 för att hantera svenska tecken
+  const encodedSubject = `=?utf-8?B?${Buffer.from(subject, "utf-8").toString("base64")}?=`;
+
   const lines = [
     `From: ${from}`,
     `To: ${to}`,
-    `Subject: ${subject}`,
+    `Subject: ${encodedSubject}`,
     "MIME-Version: 1.0",
     "Content-Type: text/plain; charset=utf-8",
     "Content-Transfer-Encoding: base64",
   ];
-  if (inReplyTo) lines.push(`In-Reply-To: ${inReplyTo}`);
-  if (references) lines.push(`References: ${references}`);
-  lines.push("", Buffer.from(body).toString("base64"));
+  const wrap = (id: string) => (id.startsWith("<") ? id : `<${id}>`);
+  if (inReplyTo) lines.push(`In-Reply-To: ${wrap(inReplyTo)}`);
+  if (references) lines.push(`References: ${references.split(" ").map(wrap).join(" ")}`);
+  lines.push("", Buffer.from(body, "utf-8").toString("base64"));
   return lines.join("\r\n");
 }
 

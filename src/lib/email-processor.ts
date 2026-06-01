@@ -11,13 +11,20 @@ const WAITING_TIMEOUT_HOURS = 48;
 const ARCHIVE_TIMEOUT_DAYS = 7;
 
 export async function processInboundEmail(email: InboundEmail): Promise<void> {
-  const company = await prisma.company.findUnique({
+  // Försök matcha på To-adress, annars ta första bolaget (MVP med ett bolag)
+  let company = await prisma.company.findFirst({
     where: { intakeEmail: email.to.toLowerCase() },
     include: { categories: { include: { fields: { orderBy: { order: "asc" } } } } },
   });
 
   if (!company) {
-    console.warn(`Inget bolag hittades för intake-adress: ${email.to}`);
+    company = await prisma.company.findFirst({
+      include: { categories: { include: { fields: { orderBy: { order: "asc" } } } } },
+    });
+  }
+
+  if (!company) {
+    console.warn(`Inget bolag hittades`);
     return;
   }
 
@@ -93,7 +100,9 @@ export async function processInboundEmail(email: InboundEmail): Promise<void> {
         residentName: extractName(email.from),
         subject: email.subject,
         emailThreadId: email.messageId,
-        categoryId: analysis.detectedCategoryId ?? null,
+        categoryId: company.categories.some((c) => c.id === analysis.detectedCategoryId)
+          ? analysis.detectedCategoryId
+          : null,
         status: analysis.escalate ? "ESCALATED" : "COLLECTING_INFORMATION",
         escalationNote: analysis.escalationReason ?? null,
         lastResidentAt: new Date(),
