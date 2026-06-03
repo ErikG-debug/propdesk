@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { HeaderDots } from "@/components/ui/HeaderDots";
+import { SignOutButton } from "@/components/dashboard/SignOutButton";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
@@ -11,13 +12,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <Link href="/dashboard" className="text-[17px] font-bold tracking-tight text-white drop-shadow">
             PropDesk
           </Link>
-          <nav className="flex gap-6 text-sm font-medium text-white drop-shadow">
+          <nav className="flex items-center gap-6 text-sm font-medium text-white drop-shadow">
             <Link href="/dashboard" className="transition hover:text-white/70">
               Ärenden
             </Link>
             <Link href="/dashboard/settings" className="transition hover:text-white/70">
               Inställningar
             </Link>
+            <SignOutButton />
           </nav>
         </div>
       </header>

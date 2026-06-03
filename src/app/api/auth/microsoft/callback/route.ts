@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { saveGmailTokens } from "@/lib/email";
+import { saveMicrosoftTokens } from "@/lib/email";
 
-// GET /api/auth/gmail/callback?code=xxx&state=companyId
+// GET /api/auth/microsoft/callback?code=xxx&state=companyId
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const session = await auth();
   if (!session) return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/login`);
@@ -14,20 +14,19 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Saknar code eller state" }, { status: 400 });
   }
 
-  // Verifiera att state-parametern matchar den inloggade användarens bolag
   if (companyId !== session.user.companyId) {
     return NextResponse.json({ error: "Obehörig" }, { status: 403 });
   }
 
   try {
-    const email = await saveGmailTokens(companyId, code);
+    const email = await saveMicrosoftTokens(companyId, code);
     return NextResponse.redirect(
-      `${process.env.NEXTAUTH_URL}/dashboard/settings?gmailConnected=${email}`
+      `${process.env.NEXTAUTH_URL}/dashboard/settings?microsoftConnected=${email}`
     );
   } catch (err) {
-    console.error("Gmail OAuth2-fel:", err);
+    console.error("Microsoft OAuth-fel:", err);
     return NextResponse.redirect(
-      `${process.env.NEXTAUTH_URL}/dashboard/settings?error=gmail_auth_failed`
+      `${process.env.NEXTAUTH_URL}/dashboard/settings?error=microsoft_auth_failed`
     );
   }
 }

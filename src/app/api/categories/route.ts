@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
-const DEMO_COMPANY_ID = process.env.DEMO_COMPANY_ID ?? "";
+import { auth } from "@/auth";
 
 export async function GET(): Promise<NextResponse> {
+  const session = await auth();
+  if (!session) return NextResponse.json({ error: "Ej autentiserad" }, { status: 401 });
+
   const categories = await prisma.issueCategory.findMany({
-    where: { companyId: DEMO_COMPANY_ID },
+    where: { companyId: session.user.companyId },
     orderBy: { name: "asc" },
     include: { fields: { orderBy: { order: "asc" } } },
   });
@@ -13,6 +15,9 @@ export async function GET(): Promise<NextResponse> {
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  const session = await auth();
+  if (!session) return NextResponse.json({ error: "Ej autentiserad" }, { status: 401 });
+
   const body = (await req.json()) as { name: string; description?: string };
 
   if (!body.name?.trim()) {
@@ -21,7 +26,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const category = await prisma.issueCategory.create({
     data: {
-      companyId: DEMO_COMPANY_ID,
+      companyId: session.user.companyId,
       name: body.name.trim(),
       description: body.description?.trim() ?? null,
     },

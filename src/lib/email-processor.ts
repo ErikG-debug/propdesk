@@ -1,6 +1,6 @@
 import { prisma } from "./prisma";
 import { analyzeIncomingEmail } from "./anthropic";
-import { sendEmailAsPropertyManager } from "./gmail";
+import { sendEmailAsPropertyManager } from "./email";
 import type { InboundEmail } from "@/types";
 import type { CaseStatus } from "@prisma/client";
 
@@ -19,13 +19,7 @@ export async function processInboundEmail(email: InboundEmail): Promise<void> {
   });
 
   if (!company) {
-    company = await prisma.company.findFirst({
-      include: { categories: { include: { fields: { orderBy: { order: "asc" } } } } },
-    });
-  }
-
-  if (!company) {
-    console.warn(`Inget bolag hittades`);
+    console.warn(`Inget bolag med intakeEmail ${email.to} hittades — ignorerar mail`);
     return;
   }
 
@@ -171,7 +165,9 @@ export async function processInboundEmail(email: InboundEmail): Promise<void> {
     },
   });
 
-  // Skicka AI-svar (inte om eskalerat och ärende redan hanteras manuellt)
+  // Skicka AI-svar — hoppa över om eskalerat (handläggare tar över manuellt)
+  if (analysis.escalate) return;
+
   const replySubject = existingCase.subject.startsWith("Re:")
     ? existingCase.subject
     : `Re: ${existingCase.subject}`;

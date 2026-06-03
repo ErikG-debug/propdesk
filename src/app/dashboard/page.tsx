@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import { CaseRow } from "@/components/cases/CaseRow";
 import type { CaseStatus } from "@prisma/client";
-
-const DEMO_COMPANY_ID = process.env.DEMO_COMPANY_ID ?? "";
 
 const STATUS_TABS: { label: string; value: CaseStatus | "ALL" }[] = [
   { label: "Alla", value: "ALL" },
@@ -14,26 +14,35 @@ const STATUS_TABS: { label: string; value: CaseStatus | "ALL" }[] = [
 ];
 
 interface PageProps {
-  searchParams: Promise<{ filter?: string }>;
+  searchParams: Promise<{ filter?: string; assigned?: string }>;
 }
 
 export default async function DashboardPage({ searchParams }: PageProps) {
-  const { filter } = await searchParams;
-  const activeFilter = filter ?? null;
+  const session = await auth();
+  if (!session) redirect("/login");
 
-  // Avgör om aktiv flik är status eller kategori-ID
+  const { companyId, id: userId } = session.user;
+  const { filter, assigned } = await searchParams;
+  const activeFilter = filter ?? null;
+  const showMine = assigned === "me";
+
   const knownStatuses = STATUS_TABS.map((t) => t.value as string);
   const isStatusFilter = !activeFilter || knownStatuses.includes(activeFilter);
   const activeStatus = isStatusFilter && activeFilter !== "ALL" ? (activeFilter as CaseStatus) : null;
   const activeCategoryId = !isStatusFilter ? activeFilter : null;
 
+  const baseWhere = {
+    companyId,
+    ...(showMine ? { assignedToId: userId } : {}),
+    ...(activeStatus ? { status: activeStatus } : {}),
+    ...(activeCategoryId ? { categoryId: activeCategoryId } : {}),
+  };
+
+  const countWhere = { companyId, ...(showMine ? { assignedToId: userId } : {}) };
+
   const [cases, categories, statusCounts, categoryCounts] = await Promise.all([
     prisma.case.findMany({
-      where: {
-        ...(DEMO_COMPANY_ID ? { companyId: DEMO_COMPANY_ID } : {}),
-        ...(activeStatus ? { status: activeStatus } : {}),
-        ...(activeCategoryId ? { categoryId: activeCategoryId } : {}),
-      },
+      where: baseWhere,
       orderBy: [{ updatedAt: "desc" }],
       include: {
         category: { select: { name: true } },
@@ -42,19 +51,19 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       },
     }),
     prisma.issueCategory.findMany({
-      where: DEMO_COMPANY_ID ? { companyId: DEMO_COMPANY_ID } : {},
+      where: { companyId },
       select: { id: true, name: true },
       orderBy: { name: "asc" },
     }),
     prisma.case.groupBy({
       by: ["status"],
       _count: { status: true },
-      where: DEMO_COMPANY_ID ? { companyId: DEMO_COMPANY_ID } : {},
+      where: countWhere,
     }),
     prisma.case.groupBy({
       by: ["categoryId"],
       _count: { categoryId: true },
-      where: DEMO_COMPANY_ID ? { companyId: DEMO_COMPANY_ID } : {},
+      where: countWhere,
     }),
   ]);
 
@@ -66,6 +75,9 @@ export default async function DashboardPage({ searchParams }: PageProps) {
   );
   const totalCount = statusCounts.reduce((sum, c) => sum + c._count.status, 0);
 
+  const assignedBase = showMine ? "&assigned=me" : "";
+  const assignedBaseQ = showMine ? "?assigned=me" : "";
+
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
@@ -73,7 +85,31 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         <span className="text-sm text-gray-400">{cases.length} ärenden</span>
       </div>
 
-      {/* Flikar */}
+      {/* Mina / Alla toggle */}
+      <div className="mb-4 flex gap-1">
+        <a
+          href="/dashboard"
+          className={`rounded-full px-3 py-1 text-sm font-medium transition ${
+            !showMine
+              ? "bg-[#1a6ba8] text-white"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          }`}
+        >
+          Alla ärenden
+        </a>
+        <a
+          href="/dashboard?assigned=me"
+          className={`rounded-full px-3 py-1 text-sm font-medium transition ${
+            showMine
+              ? "bg-[#1a6ba8] text-white"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          }`}
+        >
+          Mina ärenden
+        </a>
+      </div>
+
+      {/* Statusflikar */}
       <div className="mb-4 flex gap-1 overflow-x-auto border-b border-gray-200 pb-px">
         {STATUS_TABS.map((tab) => {
           const count =
@@ -86,7 +122,11 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           return (
             <a
               key={tab.value}
-              href={tab.value === "ALL" ? "/dashboard" : `/dashboard?filter=${tab.value}`}
+              href={
+                tab.value === "ALL"
+                  ? `/dashboard${assignedBaseQ}`
+                  : `/dashboard?filter=${tab.value}${assignedBase}`
+              }
               className={`flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition ${
                 isActive
                   ? "border-[#1a6ba8] text-[#1a6ba8]"
@@ -103,7 +143,6 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           );
         })}
 
-        {/* Kategoriflikar — visas om kategorier finns */}
         {categories.length > 0 && (
           <>
             <div className="mx-2 my-2 w-px bg-gray-200" />
@@ -113,7 +152,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
               return (
                 <a
                   key={cat.id}
-                  href={`/dashboard?filter=${cat.id}`}
+                  href={`/dashboard?filter=${cat.id}${assignedBase}`}
                   className={`flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition ${
                     isActive
                       ? "border-gray-900 text-gray-900"

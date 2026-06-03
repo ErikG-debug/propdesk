@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
 import type { CaseStatus } from "@prisma/client";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params): Promise<NextResponse> {
+  const session = await auth();
+  if (!session) return NextResponse.json({ error: "Ej autentiserad" }, { status: 401 });
+
   const { id } = await params;
 
   const caseData = await prisma.case.findUnique({
@@ -20,7 +24,7 @@ export async function GET(_req: NextRequest, { params }: Params): Promise<NextRe
     },
   });
 
-  if (!caseData) {
+  if (!caseData || caseData.companyId !== session.user.companyId) {
     return NextResponse.json({ error: "Ärende hittades inte" }, { status: 404 });
   }
 
@@ -28,8 +32,16 @@ export async function GET(_req: NextRequest, { params }: Params): Promise<NextRe
 }
 
 export async function PATCH(req: NextRequest, { params }: Params): Promise<NextResponse> {
+  const session = await auth();
+  if (!session) return NextResponse.json({ error: "Ej autentiserad" }, { status: 401 });
+
   const { id } = await params;
-  const body = (await req.json()) as { status?: CaseStatus; note?: string };
+  const body = (await req.json()) as { status?: CaseStatus; note?: string; assignedToId?: string | null };
+
+  const current = await prisma.case.findUnique({ where: { id }, select: { status: true, companyId: true } });
+  if (!current || current.companyId !== session.user.companyId) {
+    return NextResponse.json({ error: "Ärende hittades inte" }, { status: 404 });
+  }
 
   const allowedTransitions: Partial<Record<CaseStatus, CaseStatus[]>> = {
     READY_FOR_REVIEW: ["IN_PROGRESS", "CLOSED"],
@@ -37,11 +49,6 @@ export async function PATCH(req: NextRequest, { params }: Params): Promise<NextR
     IN_PROGRESS: ["CLOSED"],
     WAITING_FOR_RESIDENT: ["IN_PROGRESS", "CLOSED"],
   };
-
-  const current = await prisma.case.findUnique({ where: { id }, select: { status: true } });
-  if (!current) {
-    return NextResponse.json({ error: "Ärende hittades inte" }, { status: 404 });
-  }
 
   if (body.status) {
     const allowed = allowedTransitions[current.status] ?? [];
@@ -58,6 +65,7 @@ export async function PATCH(req: NextRequest, { params }: Params): Promise<NextR
     data: {
       ...(body.status ? { status: body.status } : {}),
       ...(body.note ? { escalationNote: body.note } : {}),
+      ...("assignedToId" in body ? { assignedToId: body.assignedToId } : {}),
     },
   });
 

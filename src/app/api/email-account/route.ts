@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
-const DEMO_COMPANY_ID = process.env.DEMO_COMPANY_ID ?? "";
+import { auth } from "@/auth";
 
 export async function GET(): Promise<NextResponse> {
-  if (!DEMO_COMPANY_ID) return NextResponse.json(null);
+  const session = await auth();
+  if (!session) return NextResponse.json({ error: "Ej autentiserad" }, { status: 401 });
 
   const account = await prisma.emailAccount.findUnique({
-    where: { companyId: DEMO_COMPANY_ID },
+    where: { companyId: session.user.companyId },
     select: { email: true, provider: true, expiresAt: true },
   });
 

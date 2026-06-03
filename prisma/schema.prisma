@@ -50,13 +50,15 @@ model Property {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  role      UserRole @default(AGENT)
-  companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
-  createdAt DateTime @default(now())
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  password      String?
+  role          UserRole @default(AGENT)
+  companyId     String
+  company       Company  @relation(fields: [companyId], references: [id])
+  createdAt     DateTime @default(now())
+  assignedCases Case[]   @relation("CaseAssignment")
 }
 
 // OAuth2-tokens för Gmail/Outlook, en per bolag
@@ -114,6 +116,8 @@ model Case {
   escalationNote  String?
   lastResidentAt  DateTime?        // senast hyresgästen svarade
   waitingSince    DateTime?        // när vi började vänta
+  assignedToId    String?
+  assignedTo      User?            @relation("CaseAssignment", fields: [assignedToId], references: [id])
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   messages        Message[]
