@@ -5,12 +5,13 @@ import { UrgencyBadge } from "@/components/ui/UrgencyBadge";
 import { ThermalStripe } from "@/components/ui/ThermalStripe";
 import type { Urgency } from "@/lib/types";
 
-type TagKind = "bo" | "manual" | "closed" | null;
+type TagKind = "bo" | "manual" | "closed" | "booked" | null;
 
 const TAG_CONFIG: Record<Exclude<TagKind, null>, { label: string; cls: string }> = {
   bo:     { label: "Bo jobbar",     cls: "bg-[#1a6ba8]/10 text-[#1a6ba8]" },
   manual: { label: "Manuellt fall", cls: "bg-amber-100 text-amber-800" },
   closed: { label: "Avslutat",      cls: "bg-gray-100 text-gray-600" },
+  booked: { label: "Bokat",         cls: "bg-emerald-100 text-emerald-800" },
 };
 
 function Tag({ kind }: { kind: TagKind }) {
@@ -38,35 +39,23 @@ interface CaseRowProps {
   fromFilter?: string;
 }
 
-export function CaseRow({
-  id,
-  subject,
-  residentEmail,
-  residentName,
-  urgency,
-  tag = null,
-  fromFilter,
-}: CaseRowProps) {
+export function CaseRow({ id, subject, residentEmail, residentName, urgency, tag = null, fromFilter }: CaseRowProps) {
   return (
     <Link
       href={`/dashboard/cases/${id}`}
       className="block"
       onClick={() => {
-        if (fromFilter) {
-          sessionStorage.setItem("bodesk:lastFilter", fromFilter);
-        }
+        if (fromFilter) sessionStorage.setItem("bodesk:lastFilter", fromFilter);
       }}
     >
       <div className="group relative flex items-center gap-4 px-5 py-4 transition hover:bg-[#1a6ba8]/5">
-        <ThermalStripe className="pointer-events-none absolute inset-y-0 left-0 h-full w-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+        <ThermalStripe className="pointer-events-none absolute bottom-2 left-0 top-2 w-1 -translate-x-1 rounded-r-full opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
 
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium text-gray-900">{subject}</p>
           <p className="mt-0.5 truncate text-sm text-gray-500">
             {residentName ?? residentEmail}
-            {residentName && (
-              <span className="ml-1 text-gray-400">· {residentEmail}</span>
-            )}
+            {residentName && <span className="ml-1 text-gray-400">· {residentEmail}</span>}
           </p>
         </div>
 
