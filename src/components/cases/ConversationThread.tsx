@@ -19,7 +19,7 @@ export function ConversationThread({ messages }: { messages: Message[] }) {
             className={`max-w-[80%] rounded-lg px-4 py-3 text-sm ${
               msg.fromResident
                 ? "bg-gray-100 text-gray-800"
-                : "bg-blue-600 text-white"
+                : "bg-[#1a6ba8] text-white"
             }`}
           >
             <p className="whitespace-pre-wrap">{msg.body}</p>
@@ -28,7 +28,7 @@ export function ConversationThread({ messages }: { messages: Message[] }) {
                 msg.fromResident ? "text-gray-400" : "text-blue-200"
               }`}
             >
-              {msg.fromResident ? "Hyresgäst" : "AI / Handläggare"} ·{" "}
+              {msg.fromResident ? "Hyresgäst" : "Bo / Handläggare"} ·{" "}
               {new Date(msg.sentAt).toLocaleString("sv-SE", {
                 day: "numeric",
                 month: "short",

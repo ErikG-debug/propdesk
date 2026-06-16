@@ -16,8 +16,6 @@ export function FieldValuesList({
   fieldValues: FieldValue[];
   requiredFields: RequiredField[];
 }) {
-  const collectedKeys = new Set(fieldValues.map((fv) => fv.field.key));
-
   return (
     <dl className="divide-y divide-gray-100">
       {requiredFields.map((f) => {
@@ -37,7 +35,6 @@ export function FieldValuesList({
           </div>
         );
       })}
-      {/* Fält som samlats men inte finns i kategori-definitionen längre */}
       {fieldValues
         .filter((fv) => !requiredFields.some((f) => f.key === fv.field.key))
         .map((fv) => (

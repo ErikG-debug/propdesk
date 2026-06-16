@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { ThermalStripe } from "@/components/ui/ThermalStripe";
 import type { CaseStatus } from "@prisma/client";
 
 interface CaseRowProps {
@@ -29,12 +30,11 @@ export function CaseRow({
 
   return (
     <Link href={`/dashboard/cases/${id}`} className="block">
-      <div className="flex items-center gap-4 border-l-2 border-transparent px-5 py-4 transition hover:border-[#1a6ba8] hover:bg-[#1a6ba8]/5">
-        {/* Vänster: ämne + avsändare */}
+      <div className="group relative flex items-center gap-4 px-5 py-4 transition hover:bg-[#1a6ba8]/5">
+        <ThermalStripe className="pointer-events-none absolute inset-y-0 left-0 h-full w-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <p className="truncate font-medium text-gray-900">{subject}</p>
-          </div>
+          <p className="truncate font-medium text-gray-900">{subject}</p>
           <p className="mt-0.5 truncate text-sm text-gray-500">
             {residentName ?? residentEmail}
             {residentName && (
@@ -46,7 +46,6 @@ export function CaseRow({
           </p>
         </div>
 
-        {/* Höger: kategori, fastighet, status, tid */}
         <div className="flex shrink-0 items-center gap-3">
           {property && (
             <span className="hidden text-xs text-gray-400 sm:block">{property.name}</span>
