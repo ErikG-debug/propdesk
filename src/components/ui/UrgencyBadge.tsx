@@ -1,4 +1,4 @@
-export type Urgency = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+import type { Urgency } from "@/lib/types";
 
 const CONFIG: Record<Urgency, { label: string; classes: string }> = {
   LOW: {

@@ -1,4 +1,4 @@
-import type { CaseStatus } from "@prisma/client";
+import type { CaseStatus } from "@/lib/types";
 
 const CONFIG: Record<CaseStatus, { label: string; classes: string }> = {
   COLLECTING_INFORMATION: {

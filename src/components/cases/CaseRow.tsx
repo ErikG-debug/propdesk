@@ -7,21 +7,15 @@ import type { Urgency } from "@/lib/types";
 
 type TagKind = "bo" | "manual" | "closed" | "booked" | null;
 
-const TAG_CONFIG: Record<Exclude<TagKind, null>, { label: string; cls: string }> = {
-  bo:     { label: "Bo jobbar",     cls: "bg-[#1a6ba8]/10 text-[#1a6ba8]" },
-  manual: { label: "Manuellt fall", cls: "bg-amber-100 text-amber-800" },
-  closed: { label: "Avslutat",      cls: "bg-gray-100 text-gray-600" },
-  booked: { label: "Bokat",         cls: "bg-emerald-100 text-emerald-800" },
-};
-
 function Tag({ kind }: { kind: TagKind }) {
-  if (!kind)
-    return (
-      <span className="invisible rounded-full px-2.5 py-1 text-xs font-semibold">
-        Platshållare
-      </span>
-    );
-  const { label, cls } = TAG_CONFIG[kind];
+  if (!kind) return <span className="invisible rounded-full px-2.5 py-1 text-xs font-semibold">Platshållare</span>;
+  const styles: Record<Exclude<TagKind, null>, { label: string; cls: string }> = {
+    bo: { label: "Bo jobbar", cls: "bg-[#1a6ba8]/10 text-[#1a6ba8]" },
+    manual: { label: "Manuellt fall", cls: "bg-amber-100 text-amber-800" },
+    closed: { label: "Avslutat", cls: "bg-gray-100 text-gray-600" },
+    booked: { label: "Bokat", cls: "bg-emerald-100 text-emerald-800" },
+  };
+  const { label, cls } = styles[kind];
   return (
     <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${cls}`}>
       {label}
@@ -45,17 +39,23 @@ export function CaseRow({ id, subject, residentEmail, residentName, urgency, tag
       href={`/dashboard/cases/${id}`}
       className="block"
       onClick={() => {
-        if (fromFilter) sessionStorage.setItem("bodesk:lastFilter", fromFilter);
+        if (typeof window !== "undefined" && fromFilter) {
+          sessionStorage.setItem("bodesk:lastFilter", fromFilter);
+        }
       }}
     >
       <div className="group relative flex items-center gap-4 px-5 py-4 transition hover:bg-[#1a6ba8]/5">
-        <ThermalStripe className="pointer-events-none absolute bottom-2 left-0 top-2 w-1 -translate-x-1 rounded-r-full opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
+        <ThermalStripe
+          className="pointer-events-none absolute left-0 top-2 bottom-2 w-1 rounded-r-full opacity-0 -translate-x-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0"
+        />
 
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium text-gray-900">{subject}</p>
           <p className="mt-0.5 truncate text-sm text-gray-500">
             {residentName ?? residentEmail}
-            {residentName && <span className="ml-1 text-gray-400">· {residentEmail}</span>}
+            {residentName && (
+              <span className="ml-1 text-gray-400">· {residentEmail}</span>
+            )}
           </p>
         </div>
 

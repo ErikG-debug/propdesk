@@ -10,23 +10,11 @@ export function ThermalStripe({
   const uid = useId().replace(/:/g, "");
   const blobs = `stripe-blobs-${uid}`;
   const grain = `stripe-grain-${uid}`;
-  const soften = `leaf-soften-${uid}`;
-  const mask = `stripe-mask-${uid}`;
+  const sheen = `stripe-sheen-${uid}`;
 
   const isHorizontal = orientation === "horizontal";
-  const LONG = 200;
-  const SHORT = 40;
-  const W = isHorizontal ? LONG : SHORT;
-  const H = isHorizontal ? SHORT : LONG;
-
-  const OFFSET = 10;
-  const RX_FACTOR = 1.5;
-  const rxLong = (LONG / 2) * RX_FACTOR;
-  const ryShort = SHORT + OFFSET;
-
-  const ellipse = isHorizontal
-    ? { cx: W / 2, cy: H + OFFSET, rx: rxLong, ry: ryShort }
-    : { cx: -OFFSET, cy: H / 2, rx: ryShort, ry: rxLong };
+  const W = isHorizontal ? 200 : 40;
+  const H = isHorizontal ? 40 : 200;
 
   return (
     <svg
@@ -34,14 +22,15 @@ export function ThermalStripe({
       className={className}
       viewBox={`0 0 ${W} ${H}`}
       preserveAspectRatio="none"
+      style={{ overflow: "hidden" }}
     >
       <defs>
-        <filter id={blobs} x="-20%" y="-5%" width="140%" height="110%">
+        <filter id={blobs} x="-5%" y="-20%" width="110%" height="140%">
           <feTurbulence
             type="fractalNoise"
-            baseFrequency="0.05 0.03"
+            baseFrequency="0.05 0.04"
             numOctaves="3"
-            seed="7"
+            seed="11"
             stitchTiles="stitch"
             result="noise"
           />
@@ -54,21 +43,21 @@ export function ThermalStripe({
                     1 0 0 0 -0.15"
             result="alpha"
           />
-          <feGaussianBlur in="alpha" stdDeviation="1.2" result="softAlpha" />
+          <feGaussianBlur in="alpha" stdDeviation="1.5" result="softAlpha" />
           <feComposite in="SourceGraphic" in2="softAlpha" operator="in" />
         </filter>
 
-        <filter id={grain} x="-20%" y="-5%" width="140%" height="110%">
+        <filter id={grain} x="-5%" y="-20%" width="110%" height="140%">
           <feTurbulence
             type="fractalNoise"
             baseFrequency="0.9 0.9"
             numOctaves="2"
-            seed="5"
+            seed="3"
             stitchTiles="stitch"
-            result="grain"
+            result="grainSrc"
           />
           <feColorMatrix
-            in="grain"
+            in="grainSrc"
             type="matrix"
             values="0 0 0 0 1
                     0 0 0 0 1
@@ -79,33 +68,23 @@ export function ThermalStripe({
           <feComposite in="SourceGraphic" in2="grainAlpha" operator="in" />
         </filter>
 
-        <filter id={soften} x="-10%" y="-10%" width="120%" height="120%">
-          <feGaussianBlur stdDeviation="3" />
-        </filter>
-
-        <mask id={mask} maskUnits="userSpaceOnUse">
-          <ellipse
-            cx={ellipse.cx}
-            cy={ellipse.cy}
-            rx={ellipse.rx}
-            ry={ellipse.ry}
-            fill="white"
-            filter={`url(#${soften})`}
-          />
-        </mask>
+        <linearGradient
+          id={sheen}
+          x1="0"
+          y1="0"
+          x2={isHorizontal ? "0" : "1"}
+          y2={isHorizontal ? "1" : "0"}
+        >
+          <stop offset="0%" stopColor="#1e4a82" stopOpacity="0.55" />
+          <stop offset="55%" stopColor="#1e4a82" stopOpacity="0" />
+          <stop offset="100%" stopColor="#000000" stopOpacity="0.25" />
+        </linearGradient>
       </defs>
 
-      <g mask={`url(#${mask})`}>
-        <rect width={W} height={H} fill="#0b2a55" />
-        <rect width={W} height={H} fill="#ffffff" filter={`url(#${blobs})`} />
-        <rect
-          width={W}
-          height={H}
-          fill="#ffffff"
-          filter={`url(#${grain})`}
-          opacity="0.55"
-        />
-      </g>
+      <rect width={W} height={H} fill="#0b2a55" />
+      <rect width={W} height={H} fill="#ffffff" filter={`url(#${blobs})`} opacity="0.55" />
+      <rect width={W} height={H} fill="#ffffff" filter={`url(#${grain})`} opacity="0.18" />
+      <rect width={W} height={H} fill={`url(#${sheen})`} />
     </svg>
   );
 }
