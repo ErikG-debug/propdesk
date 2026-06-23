@@ -1,30 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { processInboundEmail } from "@/lib/email-processor";
 import type { InboundEmail } from "@/types";
-import crypto from "crypto";
-
-// Postmark skickar ett X-Postmark-Signature header som vi verifierar
-function verifyPostmarkWebhook(body: string, signature: string): boolean {
-  const secret = process.env.POSTMARK_WEBHOOK_SECRET;
-  if (!secret || !signature) return false;
-  const expected = crypto
-    .createHmac("sha256", secret)
-    .update(body)
-    .digest("base64");
-  const expectedBuf = Buffer.from(expected);
-  const sigBuf = Buffer.from(signature);
-  if (expectedBuf.length !== sigBuf.length) return false;
-  return crypto.timingSafeEqual(expectedBuf, sigBuf);
-}
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const rawBody = await req.text();
-  const signature = req.headers.get("x-postmark-signature") ?? "";
-
-  const webhookSecret = process.env.POSTMARK_WEBHOOK_SECRET;
-  if (webhookSecret && !verifyPostmarkWebhook(rawBody, signature)) {
-    return NextResponse.json({ error: "Ogiltig signatur" }, { status: 401 });
-  }
 
   let payload: Record<string, unknown>;
   try {
@@ -59,10 +38,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   try {
     await processInboundEmail(email);
-    return NextResponse.json({ ok: true });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
+    // Logga men returnera 200 — Postmark försöker annars om vid 5xx och vi
+    // riskerar att ärendet skapas och svar skickas flera gånger.
     console.error("Fel vid bearbetning av inkommande mail:", err);
-    return NextResponse.json({ error: msg }, { status: 500 });
   }
+  return NextResponse.json({ ok: true });
 }
