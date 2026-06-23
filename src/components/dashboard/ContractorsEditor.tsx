@@ -1,15 +1,30 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useContractors, addContractor, removeContractor, type Contractor } from "@/lib/contractors";
+
+interface Category {
+  id: string;
+  name: string;
+}
 
 export function ContractorsEditor() {
   const contractors = useContractors();
+  const [categories, setCategories] = useState<Category[]>([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((r) => r.json())
+      .then((data: unknown) => {
+        if (Array.isArray(data)) setCategories(data as Category[]);
+      })
+      .catch(() => null);
+  }, []);
 
   const grouped = useCallback(() => {
     const map = new Map<string, Contractor[]>();
@@ -22,10 +37,10 @@ export function ContractorsEditor() {
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !role.trim()) return;
+    if (!name.trim() || !email.trim() || !role) return;
     setSubmitting(true);
     setTimeout(() => {
-      addContractor({ name: name.trim(), email: email.trim(), phone: phone.trim() || null, role: role.trim() });
+      addContractor({ name: name.trim(), email: email.trim(), phone: phone.trim() || null, role });
       setName(""); setEmail(""); setPhone(""); setRole("");
       setSubmitting(false);
     }, 150);
@@ -37,7 +52,7 @@ export function ContractorsEditor() {
     <div className="rounded-xl border border-gray-200 bg-white p-6">
       <h2 className="mb-1 font-semibold text-gray-900">Servicepersonal</h2>
       <p className="mb-5 text-sm text-gray-500">
-        Hantera rörmokare, elektriker och andra hantverkare. Varje person kopplas till en roll.
+        Hantera servicepersonal per ärendekategori.
       </p>
 
       <div className="mb-5 space-y-4">
@@ -67,11 +82,45 @@ export function ContractorsEditor() {
       <form onSubmit={submit} className="border-t border-gray-100 pt-4">
         <p className="mb-2 text-sm font-medium text-gray-700">Ny servicepersonal</p>
         <div className="flex flex-wrap gap-2">
-          <input className="min-w-32 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a6ba8]/30" placeholder="Namn" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
-          <input className="min-w-48 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a6ba8]/30" placeholder="E-postadress" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={255} />
-          <input className="min-w-32 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a6ba8]/30" placeholder="Telefon (valfritt)" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={50} />
-          <input className="min-w-32 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a6ba8]/30" placeholder="Roll (t.ex. Rörmokare)" value={role} onChange={(e) => setRole(e.target.value)} maxLength={50} />
-          <button type="submit" disabled={submitting || !name.trim() || !email.trim() || !role.trim()} className="rounded-md bg-[#1a6ba8] px-4 py-2 text-sm font-medium text-white hover:bg-[#155a8f] disabled:opacity-40">
+          <input
+            className="min-w-32 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a6ba8]/30"
+            placeholder="Namn"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={100}
+          />
+          <input
+            className="min-w-48 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a6ba8]/30"
+            placeholder="E-postadress"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            maxLength={255}
+          />
+          <input
+            className="min-w-32 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a6ba8]/30"
+            placeholder="Telefon (valfritt)"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            maxLength={50}
+          />
+          <select
+            className="min-w-40 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1a6ba8]/30"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          >
+            <option value="">Välj kategori</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.name}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+          <button
+            type="submit"
+            disabled={submitting || !name.trim() || !email.trim() || !role}
+            className="rounded-md bg-[#1a6ba8] px-4 py-2 text-sm font-medium text-white hover:bg-[#155a8f] disabled:opacity-40"
+          >
             Lägg till
           </button>
         </div>

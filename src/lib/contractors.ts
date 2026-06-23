@@ -11,11 +11,7 @@ export type Contractor = {
 const KEY = "bodesk:contractors";
 const EVT = "bodesk:contractors";
 
-const DEFAULT: Contractor[] = [
-  { id: "mock-1", name: "Anders Rörsson", email: "anders@ror.se", phone: "070-123 45 67", role: "Rörmokare" },
-  { id: "mock-2", name: "Lisa Läckan", email: "lisa@ror.se", phone: null, role: "Rörmokare" },
-  { id: "mock-3", name: "Erik Elektrisk", email: "erik@el.se", phone: "073-987 65 43", role: "Elektriker" },
-];
+const DEFAULT: Contractor[] = [];
 
 function read(): Contractor[] {
   if (typeof window === "undefined") return DEFAULT;
