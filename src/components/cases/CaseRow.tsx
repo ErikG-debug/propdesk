@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { ThermalStripe } from "@/components/ui/ThermalStripe";
 
 type TagKind = "waiting" | "ready" | "manual" | "in_progress" | "closed" | null;
 
@@ -43,9 +42,7 @@ export function CaseRow({ id, subject, residentEmail, residentName, tag = null, 
       }}
     >
       <div className="group relative flex items-center gap-4 px-5 py-4 transition hover:bg-[#1a6ba8]/[0.03]">
-        <ThermalStripe
-          className="pointer-events-none absolute left-0 top-2 bottom-2 w-1 rounded-r-full opacity-0 -translate-x-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0"
-        />
+        <span className="pointer-events-none absolute left-0 top-3 bottom-3 w-0.5 rounded-r-full bg-[#1a6ba8] opacity-0 -translate-x-0.5 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0" />
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium text-gray-900">{subject}</p>
           <p className="mt-0.5 truncate text-sm text-gray-500">

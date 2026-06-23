@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CaseRow } from "@/components/cases/CaseRow";
 import { ReviewDeck, type ReviewCase } from "@/components/cases/ReviewDeck";
-import { ThermalStripe } from "@/components/ui/ThermalStripe";
 import { useClosedCases, closeCase } from "@/lib/closedCases";
 import { useManualCases, markManual } from "@/lib/caseOverrides";
 import { useCaseStages, setCaseStage } from "@/lib/caseStages";
@@ -183,8 +182,8 @@ export function DashboardContent() {
 
   return (
     <div>
-      <div className="mb-3 flex items-center justify-between gap-1 overflow-x-auto border-b border-gray-200 pb-px">
-        <div className="flex gap-1">
+      <div className="mb-3 flex items-center justify-between gap-1 overflow-x-auto border-b border-gray-200">
+        <div className="flex">
           {TABS.map((tab) => {
             const count = countFor(tab.value);
             const isActive = activeFilter === tab.value;
@@ -192,21 +191,15 @@ export function DashboardContent() {
               <Link
                 key={tab.value}
                 href={`/dashboard?filter=${FILTER_SLUG[tab.value]}`}
-                className={`flex shrink-0 items-center gap-1.5 px-3 py-2 text-sm font-medium transition ${
-                  isActive ? "text-[#1a6ba8]" : "text-gray-500 hover:text-[#1a6ba8]"
+                className={`flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-3 text-sm font-medium transition ${
+                  isActive
+                    ? "border-[#1a6ba8] text-[#1a6ba8]"
+                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                 }`}
               >
-                <span className="relative">
-                  {tab.label}
-                  {isActive && (
-                    <ThermalStripe
-                      orientation="horizontal"
-                      className="pointer-events-none absolute inset-x-0 -bottom-[5px] h-[2px] rounded-full"
-                    />
-                  )}
-                </span>
+                {tab.label}
                 {count > 0 && (
-                  <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">
+                  <span className={`rounded-full px-1.5 py-0.5 text-xs ${isActive ? "bg-[#1a6ba8]/10 text-[#1a6ba8]" : "bg-gray-100 text-gray-500"}`}>
                     {count}
                   </span>
                 )}

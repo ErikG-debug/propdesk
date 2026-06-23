@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Calendar, User, Phone, Mail, CheckCircle, X } from "lucide-react";
-import { ThermalStripe } from "@/components/ui/ThermalStripe";
 import { useContractors } from "@/lib/contractors";
 import { useCaseAssignees } from "@/lib/caseAssignees";
 import { setCaseStage } from "@/lib/caseStages";
@@ -94,10 +93,7 @@ export function BookingGate({ pendingCases, lockedCases, onMarkDone }: Props) {
 
           <div className="mx-auto w-full max-w-2xl">
             <div className="overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-md shadow-blue-100/60">
-              <ThermalStripe
-                orientation="horizontal"
-                className="pointer-events-none h-1 w-full"
-              />
+              <div className="h-[3px] w-full bg-[#1a6ba8]" />
 
               {/* Header */}
               <div className="flex items-start justify-between gap-3 border-b border-gray-100 px-6 pb-4 pt-5">

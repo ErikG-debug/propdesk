@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, User, MapPin, ChevronDown, Check } from "lucide-react";
-import { ThermalStripe } from "@/components/ui/ThermalStripe";
 import { useContractors } from "@/lib/contractors";
 import { useCaseAssignees, setCaseAssignee } from "@/lib/caseAssignees";
 import type { Urgency } from "@/lib/types";
@@ -136,12 +135,9 @@ export function ReviewDeck({ cases, onApprove, onManual }: Props) {
         {/* Main card */}
         <div
           key={animKey}
-          className={`relative z-20 overflow-hidden rounded-2xl bg-white shadow-[0_4px_8px_rgba(0,0,0,0.08),0_16px_32px_rgba(0,0,0,0.07)] ${enterClass}`}
+          className={`relative z-20 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ${enterClass}`}
         >
-          <ThermalStripe
-            orientation="horizontal"
-            className="pointer-events-none absolute inset-x-0 top-0 h-1"
-          />
+          <div className="absolute inset-x-0 top-0 h-[3px] bg-[#1a6ba8]" />
 
           {/* ── Header ── */}
           <div className="flex items-start justify-between gap-3 px-6 pt-6 pb-4 border-b border-gray-100">

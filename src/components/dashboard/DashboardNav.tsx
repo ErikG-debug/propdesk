@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NavActiveIndicator } from "@/components/ui/NavActiveIndicator";
 import { SignOutButton } from "@/components/dashboard/SignOutButton";
 
 function NavLink({ href, label, exact = false }: { href: string; label: string; exact?: boolean }) {
@@ -12,24 +11,25 @@ function NavLink({ href, label, exact = false }: { href: string; label: string; 
   return (
     <Link
       href={href}
-      className={`relative px-2 py-1 text-sm transition ${
-        isActive ? "font-bold text-white" : "font-medium text-white/80 hover:text-white"
+      className={`flex items-center border-b-2 px-3 py-4 text-sm font-medium transition ${
+        isActive
+          ? "border-[#1a6ba8] text-[#1a6ba8]"
+          : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-800"
       }`}
     >
       {label}
-      {isActive && (
-        <NavActiveIndicator className="pointer-events-none absolute inset-x-0 -bottom-2 h-1.5 w-full" />
-      )}
     </Link>
   );
 }
 
 export function DashboardNav() {
   return (
-    <nav className="flex items-center justify-center gap-8 drop-shadow">
+    <nav className="flex flex-1 items-stretch gap-1">
       <NavLink href="/dashboard" label="Ärenden" exact />
       <NavLink href="/dashboard/settings" label="Inställningar" />
-      <SignOutButton />
+      <div className="ml-auto flex items-center">
+        <SignOutButton />
+      </div>
     </nav>
   );
 }
