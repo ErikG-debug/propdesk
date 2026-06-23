@@ -5,14 +5,17 @@ import { UrgencyBadge } from "@/components/ui/UrgencyBadge";
 import { ThermalStripe } from "@/components/ui/ThermalStripe";
 import type { Urgency } from "@/lib/types";
 
-type TagKind = "manual" | "closed" | "ready" | null;
+type TagKind = "collecting" | "waiting" | "ready" | "manual" | "in_progress" | "closed" | null;
 
 function Tag({ kind }: { kind: TagKind }) {
   if (!kind) return <span className="invisible rounded-full px-2.5 py-1 text-xs font-semibold">Platshållare</span>;
   const styles: Record<Exclude<TagKind, null>, { label: string; cls: string }> = {
-    ready:  { label: "Inväntar godkännande", cls: "bg-blue-50 text-blue-700" },
-    manual: { label: "Manuellt fall", cls: "bg-amber-100 text-amber-800" },
-    closed: { label: "Avslutat", cls: "bg-gray-100 text-gray-600" },
+    collecting:  { label: "Bo samlar info",          cls: "bg-[#1a6ba8]/10 text-[#1a6ba8]" },
+    waiting:     { label: "Väntar på svar",           cls: "bg-violet-50 text-violet-700" },
+    ready:       { label: "Redo för godkännande",     cls: "bg-blue-50 text-blue-700" },
+    manual:      { label: "Manuellt fall",            cls: "bg-amber-100 text-amber-800" },
+    in_progress: { label: "Pågår",                   cls: "bg-emerald-50 text-emerald-700" },
+    closed:      { label: "Avslutat",                cls: "bg-gray-100 text-gray-600" },
   };
   const { label, cls } = styles[kind];
   return (

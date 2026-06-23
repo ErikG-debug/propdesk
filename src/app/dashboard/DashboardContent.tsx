@@ -137,11 +137,13 @@ export function DashboardContent() {
     return cases.filter((c) => matches(c, f)).length;
   }
 
-  function tagFor(c: Enriched): "manual" | "closed" | "ready" | null {
-    if (c.isClosed) return activeFilter === "CLOSED" ? "closed" : null;
+  function tagFor(c: Enriched): "collecting" | "waiting" | "ready" | "manual" | "in_progress" | "closed" | null {
+    if (c.isClosed) return "closed";
     if (c.isManual) return "manual";
     if (c.isReady) return "ready";
-    return null;
+    if (c.status === "IN_PROGRESS") return "in_progress";
+    if (c.status === "WAITING_FOR_RESIDENT") return "waiting";
+    return "collecting";
   }
 
   const reviewCases: ReviewCase[] = useMemo(
