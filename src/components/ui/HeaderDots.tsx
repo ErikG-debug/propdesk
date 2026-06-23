@@ -10,59 +10,39 @@ export function HeaderDots() {
       preserveAspectRatio="xMidYMid slice"
     >
       <defs>
-        <filter id="thermal-blobs" x="-5%" y="-20%" width="110%" height="140%">
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.014 0.022"
-            numOctaves="3"
-            seed="11"
-            stitchTiles="stitch"
-            result="noise"
-          />
-          <feColorMatrix
-            in="noise"
-            type="matrix"
-            values="0 0 0 0 1
-                    0 0 0 0 1
-                    0 0 0 0 1
-                    1 0 0 0 -0.15"
-            result="alpha"
-          />
-          <feGaussianBlur in="alpha" stdDeviation="3" result="softAlpha" />
-          <feComposite in="SourceGraphic" in2="softAlpha" operator="in" />
-        </filter>
-
-        <filter id="thermal-grain" x="-5%" y="-20%" width="110%" height="140%">
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.9 0.9"
-            numOctaves="2"
-            seed="3"
-            stitchTiles="stitch"
-            result="grain"
-          />
-          <feColorMatrix
-            in="grain"
-            type="matrix"
-            values="0 0 0 0 1
-                    0 0 0 0 1
-                    0 0 0 0 1
-                    1 0 0 0 -0.35"
-            result="grainAlpha"
-          />
-          <feComposite in="SourceGraphic" in2="grainAlpha" operator="in" />
-        </filter>
+        {/* Fint rutnät — 20 px */}
+        <pattern id="bp-fine" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" strokeWidth="0.4" />
+        </pattern>
+        {/* Grovt rutnät — 100 px */}
+        <pattern id="bp-major" width="100" height="100" patternUnits="userSpaceOnUse">
+          <path d="M 100 0 L 0 0 0 100" fill="none" stroke="white" strokeWidth="0.9" />
+        </pattern>
+        {/* Krysspunkter vid grovt rutnät */}
+        <pattern id="bp-dots" width="100" height="100" patternUnits="userSpaceOnUse">
+          <circle cx="0"   cy="0"   r="1.4" fill="white" />
+          <circle cx="100" cy="0"   r="1.4" fill="white" />
+          <circle cx="0"   cy="100" r="1.4" fill="white" />
+          <circle cx="100" cy="100" r="1.4" fill="white" />
+        </pattern>
+        {/* Tonar ut mot höger */}
+        <linearGradient id="bp-fade-r" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="55%" stopColor="#0b2a55" stopOpacity="0" />
+          <stop offset="100%" stopColor="#0b2a55" stopOpacity="0.8" />
+        </linearGradient>
+        {/* Subtil nedåt-ton längst ner */}
+        <linearGradient id="bp-fade-b" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="60%" stopColor="#0b2a55" stopOpacity="0" />
+          <stop offset="100%" stopColor="#051828" stopOpacity="0.3" />
+        </linearGradient>
       </defs>
 
       <rect width={W} height={H} fill="#0b2a55" />
-      <rect width={W} height={H} fill="#ffffff" filter="url(#thermal-blobs)" />
-      <rect
-        width={W}
-        height={H}
-        fill="#ffffff"
-        filter="url(#thermal-grain)"
-        opacity="0.55"
-      />
+      <rect width={W} height={H} fill="url(#bp-fine)"  opacity="0.055" />
+      <rect width={W} height={H} fill="url(#bp-major)" opacity="0.1" />
+      <rect width={W} height={H} fill="url(#bp-dots)"  opacity="0.16" />
+      <rect width={W} height={H} fill="url(#bp-fade-r)" />
+      <rect width={W} height={H} fill="url(#bp-fade-b)" />
     </svg>
   );
 }

@@ -297,22 +297,25 @@ export default function CaseDetailPage() {
     <div>
       <Link
         href="/dashboard"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800"
+        className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition hover:text-gray-900"
       >
-        ← Ärenden
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+          <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        Ärenden
       </Link>
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* ===== KONVERSATION ===== */}
         <div className="space-y-4 lg:col-span-2">
-          <div className="rounded-lg border border-gray-200 bg-white p-6">
-            <div className="mb-4 flex items-start justify-between gap-3">
+          <div className="rounded-xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.07),0_6px_16px_rgba(0,0,0,0.05)]">
+            <div className="mb-5 flex items-start justify-between gap-3">
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">{caseData.subject}</h1>
-                <p className="mt-1 text-sm text-gray-500">
+                <h1 className="text-lg font-semibold text-gray-900">{caseData.subject}</h1>
+                <p className="mt-0.5 text-sm text-gray-500">
                   {caseData.residentName ?? caseData.residentEmail}
                   {caseData.residentName && (
-                    <span className="ml-1 text-gray-400">({caseData.residentEmail})</span>
+                    <span className="ml-1 text-gray-400">· {caseData.residentEmail}</span>
                   )}
                 </p>
               </div>
@@ -414,7 +417,7 @@ export default function CaseDetailPage() {
         <div className="space-y-4">
           {/* Bokningsstatus – only when isBooked */}
           {isBooked && (
-            <div className="rounded-lg border border-gray-200 bg-white p-4">
+            <div className="rounded-xl bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.07),0_6px_16px_rgba(0,0,0,0.05)]">
               <h2 className="mb-3 text-sm font-medium text-gray-700">Bokningsstatus</h2>
               <ol className="relative space-y-3">
                 {BOOKING_STEPS.map((step, i) => {
@@ -456,7 +459,7 @@ export default function CaseDetailPage() {
 
           {/* Prioritet – only when manual */}
           {isManual && !isClosed && (
-            <div className="rounded-lg border border-gray-200 bg-white p-4">
+            <div className="rounded-xl bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.07),0_6px_16px_rgba(0,0,0,0.05)]">
               <h2 className="mb-3 text-sm font-medium text-gray-700">Prioritet</h2>
               <label htmlFor="urgency" className="sr-only">Prioritet</label>
               <select
@@ -475,7 +478,7 @@ export default function CaseDetailPage() {
 
           {/* Manuellt fall – when not already manual */}
           {!isClosed && !isManual && (
-            <div className="rounded-lg border border-gray-200 bg-white p-4">
+            <div className="rounded-xl bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.07),0_6px_16px_rgba(0,0,0,0.05)]">
               <h2 className="mb-1 text-sm font-medium text-gray-700">Manuellt fall</h2>
               <p className="mb-3 text-xs text-gray-400">
                 Ta över ärendet manuellt. Det flyttas till fliken Manuella fall.
@@ -491,7 +494,7 @@ export default function CaseDetailPage() {
           )}
 
           {/* Information */}
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="rounded-xl bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.07),0_6px_16px_rgba(0,0,0,0.05)]">
             {(isManual || isClosed) ? (
               <button
                 type="button"
@@ -558,7 +561,7 @@ export default function CaseDetailPage() {
 
           {/* Skicka vidare – only when manual */}
           {!isClosed && isManual && (
-            <div className="rounded-lg border border-gray-200 bg-white p-4">
+            <div className="rounded-xl bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.07),0_6px_16px_rgba(0,0,0,0.05)]">
               <h2 className="mb-1 text-sm font-medium text-gray-700">Skicka vidare</h2>
               <p className="mb-3 text-xs text-gray-400">
                 Välj kategori — mottagaradressen hämtas automatiskt från inställningarna.

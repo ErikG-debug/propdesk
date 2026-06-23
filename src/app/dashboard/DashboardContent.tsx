@@ -248,7 +248,7 @@ export function DashboardContent() {
       ) : filteredCases.length === 0 ? (
         <div className="py-20 text-center text-gray-500">Inga ärenden att visa</div>
       ) : (
-        <div className="divide-y divide-blue-50 overflow-hidden rounded-xl border border-blue-100 bg-white shadow-sm shadow-blue-100">
+        <div className="divide-y divide-gray-100 overflow-hidden rounded-xl bg-white shadow-[0_1px_3px_rgba(0,0,0,0.07),0_6px_16px_rgba(0,0,0,0.05)]">
           {filteredCases.map((c) => (
             <CaseRow
               key={c.id}

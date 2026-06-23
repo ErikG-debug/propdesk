@@ -5,11 +5,14 @@ import { DashboardNav } from "@/components/dashboard/DashboardNav";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      <header className="relative z-10 overflow-hidden border-b border-white/10 bg-[#0b2a55]">
+    <div className="flex min-h-screen flex-col bg-[#f4f6f9]">
+      <header className="relative z-10 overflow-hidden bg-[#0b2a55]">
         <HeaderDots />
-        <div className="relative mx-auto grid max-w-7xl grid-cols-3 items-center px-6 py-5">
-          <Link href="/dashboard" className="justify-self-start text-[17px] font-bold tracking-tight text-white drop-shadow">
+        <div className="relative mx-auto grid max-w-7xl grid-cols-3 items-center px-6 py-4">
+          <Link
+            href="/dashboard"
+            className="justify-self-start text-[17px] font-bold tracking-tight text-white"
+          >
             BoDesk
           </Link>
           <DashboardNav />
