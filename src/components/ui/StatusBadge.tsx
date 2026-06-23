@@ -7,7 +7,7 @@ const CONFIG: Record<CaseStatus, { label: string; classes: string }> = {
   },
   WAITING_FOR_RESIDENT: {
     label: "Väntar på svar",
-    classes: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
+    classes: "bg-violet-50 text-violet-700 ring-1 ring-violet-200",
   },
   READY_FOR_REVIEW: {
     label: "Redo",
