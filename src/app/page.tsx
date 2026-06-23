@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col bg-orange-400">
+    <main className="flex min-h-screen flex-col bg-white">
       {/* Header */}
       <header className="border-b border-gray-100 px-6 py-4">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
