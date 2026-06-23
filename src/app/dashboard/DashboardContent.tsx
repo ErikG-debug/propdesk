@@ -138,7 +138,7 @@ export function DashboardContent() {
   }
 
   function tagFor(c: Enriched): "waiting" | "ready" | "manual" | "in_progress" | "closed" | null {
-    if (c.isClosed) return "closed";
+    if (activeFilter === "CLOSED") return "closed";
     if (c.isManual) return "manual";
     if (c.isReady) return "ready";
     if (c.status === "IN_PROGRESS") return "in_progress";
