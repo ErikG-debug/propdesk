@@ -79,6 +79,7 @@ async function getAuthorizedClient(companyId: string) {
       where: { companyId },
       data: {
         accessToken: credentials.access_token!,
+        ...(credentials.refresh_token ? { refreshToken: credentials.refresh_token } : {}),
         expiresAt: new Date(credentials.expiry_date ?? Date.now() + 3600 * 1000),
       },
     });

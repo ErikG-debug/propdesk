@@ -11,22 +11,23 @@ const WAITING_TIMEOUT_HOURS = 48;
 const ARCHIVE_TIMEOUT_DAYS = 7;
 const GDPR_DELETE_DAYS = 90;
 
-export async function processInboundEmail(email: InboundEmail): Promise<void> {
+export async function processInboundEmail(email: InboundEmail, overrideCompanyId?: string): Promise<void> {
   const companyInclude = {
     categories: { include: { fields: { orderBy: { order: "asc" as const } } } },
   };
 
   // Matcha på To-adress, sedan bolaget med e-postkonto kopplat, annars första bolaget
-  let company =
-    (await prisma.company.findFirst({
-      where: { intakeEmail: email.to.toLowerCase() },
-      include: companyInclude,
-    })) ??
-    (await prisma.company.findFirst({
-      where: { emailAccount: { isNot: null } },
-      include: companyInclude,
-    })) ??
-    (await prisma.company.findFirst({ include: companyInclude }));
+  let company = overrideCompanyId
+    ? await prisma.company.findUnique({ where: { id: overrideCompanyId }, include: companyInclude })
+    : (await prisma.company.findFirst({
+        where: { intakeEmail: email.to.toLowerCase() },
+        include: companyInclude,
+      })) ??
+      (await prisma.company.findFirst({
+        where: { emailAccount: { isNot: null } },
+        include: companyInclude,
+      })) ??
+      (await prisma.company.findFirst({ include: companyInclude }));
 
   console.log(`Bolag valt: ${company?.id} (${company?.name}) för inkommande mail till ${email.to}`);
 

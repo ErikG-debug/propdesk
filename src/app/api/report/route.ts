@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { processInboundEmail } from "@/lib/email-processor";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const body = await req.json();
@@ -22,6 +23,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const textBody = parts.join("\n");
   const messageId = `<webform-${Date.now()}-${Math.random().toString(36).slice(2)}@bodesk.se>`;
 
+  // Välj det bolag vars Gmail-konto senast uppdaterades (undviker testbolag med ogiltiga tokens)
+  const latestAccount = await prisma.emailAccount.findFirst({
+    orderBy: { updatedAt: "desc" },
+    select: { companyId: true },
+  });
+
   try {
     await processInboundEmail({
       from,
@@ -29,7 +36,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       subject: shortDescription.trim(),
       textBody,
       messageId,
-    });
+    }, latestAccount?.companyId);
   } catch (err) {
     console.error("Fel vid processInboundEmail från webformulär:", err);
     return NextResponse.json({ error: "Något gick fel. Försök igen senare." }, { status: 500 });
