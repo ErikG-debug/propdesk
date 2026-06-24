@@ -201,28 +201,35 @@ export async function processInboundEmail(email: InboundEmail): Promise<void> {
     ? `${analysis.replyMessage}\n\n${aiSignature}`
     : analysis.replyMessage;
 
-  const sentMessageId = await sendEmailAsPropertyManager({
-    companyId: company.id,
-    to: email.from,
-    subject: replySubject,
-    body: aiBody,
-    inReplyTo: email.messageId,
-    references: email.inReplyTo
-      ? `${email.inReplyTo} ${email.messageId}`
-      : email.messageId,
-  });
-
-  await prisma.message.create({
-    data: {
-      caseId: existingCase.id,
-      fromResident: false,
+  let sentMessageId: string | null = null;
+  try {
+    sentMessageId = await sendEmailAsPropertyManager({
+      companyId: company.id,
+      to: email.from,
+      subject: replySubject,
       body: aiBody,
-      emailId: sentMessageId,
-    },
-  });
+      inReplyTo: email.messageId,
+      references: email.inReplyTo
+        ? `${email.inReplyTo} ${email.messageId}`
+        : email.messageId,
+    });
+  } catch (err) {
+    console.error("Kunde inte skicka AI-svar via Gmail:", err);
+  }
+
+  if (sentMessageId) {
+    await prisma.message.create({
+      data: {
+        caseId: existingCase.id,
+        fromResident: false,
+        body: aiBody,
+        emailId: sentMessageId,
+      },
+    });
+  }
 
   // Sätt väntar-status om mail skickades och vi inte är klara
-  if (!analysis.isComplete && !analysis.escalate) {
+  if (sentMessageId && !analysis.isComplete && !analysis.escalate) {
     await prisma.case.update({
       where: { id: existingCase.id },
       data: {

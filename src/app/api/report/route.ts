@@ -22,13 +22,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const textBody = parts.join("\n");
   const messageId = `<webform-${Date.now()}-${Math.random().toString(36).slice(2)}@bodesk.se>`;
 
-  await processInboundEmail({
-    from,
-    to: "webform@bodesk.internal",
-    subject: shortDescription.trim(),
-    textBody,
-    messageId,
-  });
+  try {
+    await processInboundEmail({
+      from,
+      to: "webform@bodesk.internal",
+      subject: shortDescription.trim(),
+      textBody,
+      messageId,
+    });
+  } catch (err) {
+    console.error("Fel vid processInboundEmail från webformulär:", err);
+    return NextResponse.json({ error: "Något gick fel. Försök igen senare." }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true });
 }
