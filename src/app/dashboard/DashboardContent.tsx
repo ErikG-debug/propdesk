@@ -54,6 +54,7 @@ interface RawCase {
   updatedAt: string;
   category: { id: string; name: string } | null;
   property: { id: string; name: string } | null;
+  fieldValues: { field: { key: string; label: string }; value: string }[];
   messages: { body: string }[];
 }
 
@@ -139,18 +140,24 @@ export function DashboardContent() {
     () =>
       cases
         .filter((c) => c.isReady)
-        .map((c) => ({
-          id: c.id,
-          subject: c.subject,
-          residentEmail: c.residentEmail,
-          residentName: c.residentName,
-          urgency: "LOW" as const,
-          category: c.category,
-          property: c.property,
-          summary: c.summary ?? "AI-sammanfattning saknas för detta ärende.",
-          assignee: c.category?.name ?? "—",
-          reportedAt: c.updatedAt,
-        })),
+        .map((c) => {
+          const addressField = c.fieldValues.find((fv) =>
+            /adress|address/i.test(fv.field.key),
+          );
+          return {
+            id: c.id,
+            subject: c.subject,
+            residentEmail: c.residentEmail,
+            residentName: c.residentName,
+            urgency: "LOW" as const,
+            category: c.category,
+            property: c.property,
+            address: addressField?.value,
+            summary: c.summary ?? "AI-sammanfattning saknas för detta ärende.",
+            assignee: c.category?.name ?? "—",
+            reportedAt: c.updatedAt,
+          };
+        }),
     [cases],
   );
 

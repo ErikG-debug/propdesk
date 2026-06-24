@@ -24,6 +24,7 @@ export interface ReviewCase {
   urgency: Urgency;
   category: { name: string } | null;
   property: { name: string } | null;
+  address?: string;
   summary: string;
   assignee: string;
   contactPhone?: string;
@@ -189,8 +190,8 @@ export function ReviewDeck({ cases, onApprove, onManual }: Props) {
             </InfoRow>
 
             <InfoRow icon={<MapPin className="h-4 w-4" />} label="Adress">
-              {current.property?.name ? (
-                <span className="text-gray-700">{current.property.name}</span>
+              {current.address ?? current.property?.name ? (
+                <span className="text-gray-700">{current.address ?? current.property?.name}</span>
               ) : (
                 <span className="italic text-gray-400">Ej angivet</span>
               )}
