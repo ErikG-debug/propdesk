@@ -7,7 +7,6 @@ import { FieldValuesList } from "@/components/cases/FieldValuesList";
 import { closeCase, reopenCase, useClosedCases } from "@/lib/closedCases";
 import { markManual, unmarkManual, useManualCases } from "@/lib/caseOverrides";
 import { useCaseStages, setCaseStage } from "@/lib/caseStages";
-import { useRoutingCategories } from "@/lib/categories";
 import { useContractors } from "@/lib/contractors";
 import type { CaseStatus } from "@prisma/client";
 
@@ -77,19 +76,17 @@ export default function CaseDetailPage() {
   const [infoOpen, setInfoOpen] = useState(false);
 
 
-  const routingCats = useRoutingCategories();
   const contractors = useContractors();
   const [selectedRoutingId, setSelectedRoutingId] = useState("");
 
-  const recipients = useMemo(() => [
-    ...routingCats.map((c) => ({ id: `r:${c.id}`, label: `${c.name}`, email: c.email })),
-    ...contractors.filter((c) => c.email).map((c) => ({ id: `c:${c.id}`, label: `${c.name} — ${c.role}`, email: c.email })),
-  ], [routingCats, contractors]);
+  const recipients = useMemo(() =>
+    contractors.filter((c) => c.email).map((c) => ({ id: c.id, label: `${c.name} — ${c.role}`, email: c.email })),
+  [contractors]);
 
   useEffect(() => {
     if (recipients.length > 0 && !selectedRoutingId) {
       const match = recipients.find(
-        (r) => r.label.toLowerCase() === (caseData?.category?.name ?? "").toLowerCase(),
+        (r) => r.label.toLowerCase().includes((caseData?.category?.name ?? "").toLowerCase()),
       );
       setSelectedRoutingId(match?.id ?? recipients[0]?.id ?? "");
     }

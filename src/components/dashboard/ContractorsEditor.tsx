@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useContractors, addContractor, removeContractor, type Contractor } from "@/lib/contractors";
 
 interface Category {
@@ -26,27 +26,26 @@ export function ContractorsEditor() {
       .catch(() => null);
   }, []);
 
-  const grouped = useCallback(() => {
+  const grouped = (() => {
     const map = new Map<string, Contractor[]>();
     for (const c of contractors) {
       if (!map.has(c.role)) map.set(c.role, []);
       map.get(c.role)!.push(c);
     }
     return new Map([...map.entries()].sort());
-  }, [contractors]);
+  })();
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !role) return;
     setSubmitting(true);
-    setTimeout(() => {
-      addContractor({ name: name.trim(), email: email.trim(), phone: phone.trim() || null, role });
+    try {
+      await addContractor({ name: name.trim(), email: email.trim(), phone: phone.trim() || null, role });
       setName(""); setEmail(""); setPhone(""); setRole("");
+    } finally {
       setSubmitting(false);
-    }, 150);
+    }
   }
-
-  const groups = grouped();
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6">
@@ -59,7 +58,7 @@ export function ContractorsEditor() {
         {contractors.length === 0 ? (
           <p className="text-sm italic text-gray-400">Ingen servicepersonal tillagd än.</p>
         ) : (
-          [...groups.entries()].map(([roleName, list]) => (
+          [...grouped.entries()].map(([roleName, list]) => (
             <div key={roleName}>
               <p className="mb-2 text-sm font-medium text-gray-700">{roleName}</p>
               <div className="space-y-2">
@@ -121,7 +120,7 @@ export function ContractorsEditor() {
             disabled={submitting || !name.trim() || !email.trim() || !role}
             className="rounded-md bg-[#1a6ba8] px-4 py-2 text-sm font-medium text-white hover:bg-[#155a8f] disabled:opacity-40"
           >
-            Lägg till
+            {submitting ? "Sparar…" : "Lägg till"}
           </button>
         </div>
       </form>

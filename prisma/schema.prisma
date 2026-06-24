@@ -40,6 +40,18 @@ model Company {
   categories   IssueCategory[]
   emailAccount EmailAccount?
   cases        Case[]
+  contractors  Contractor[]
+}
+
+model Contractor {
+  id        String   @id @default(cuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  name      String
+  email     String
+  phone     String?
+  role      String
+  createdAt DateTime @default(now())
 }
 
 model Property {

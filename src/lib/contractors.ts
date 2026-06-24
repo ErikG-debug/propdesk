@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export type Contractor = {
   id: string;
@@ -8,48 +8,43 @@ export type Contractor = {
   role: string;
 };
 
-const KEY = "bodesk:contractors";
-const EVT = "bodesk:contractors";
+const EVT = "bodesk:contractors:refresh";
 
-const DEFAULT: Contractor[] = [];
-
-function read(): Contractor[] {
-  if (typeof window === "undefined") return DEFAULT;
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return DEFAULT;
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as Contractor[]) : DEFAULT;
-  } catch {
-    return DEFAULT;
-  }
+function triggerRefresh() {
+  if (typeof window !== "undefined") window.dispatchEvent(new Event(EVT));
 }
 
-function write(list: Contractor[]) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(KEY, JSON.stringify(list));
-  window.dispatchEvent(new Event(EVT));
+export async function addContractor(c: Omit<Contractor, "id">): Promise<void> {
+  await fetch("/api/contractors", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(c),
+  });
+  triggerRefresh();
 }
 
-export function addContractor(c: Omit<Contractor, "id">) {
-  const list = read();
-  write([...list, { ...c, id: `local-${Date.now()}` }]);
-}
-
-export function removeContractor(id: string) {
-  write(read().filter((c) => c.id !== id));
+export async function removeContractor(id: string): Promise<void> {
+  await fetch(`/api/contractors/${id}`, { method: "DELETE" });
+  triggerRefresh();
 }
 
 export function useContractors(): Contractor[] {
-  const [list, setList] = useState<Contractor[]>(() => read());
-  useEffect(() => {
-    const update = () => setList(read());
-    window.addEventListener(EVT, update);
-    window.addEventListener("storage", update);
-    return () => {
-      window.removeEventListener(EVT, update);
-      window.removeEventListener("storage", update);
-    };
+  const [list, setList] = useState<Contractor[]>([]);
+
+  const load = useCallback(() => {
+    fetch("/api/contractors")
+      .then((r) => r.json())
+      .then((data: unknown) => {
+        if (Array.isArray(data)) setList(data as Contractor[]);
+      })
+      .catch(() => null);
   }, []);
+
+  useEffect(() => {
+    load();
+    window.addEventListener(EVT, load);
+    return () => window.removeEventListener(EVT, load);
+  }, [load]);
+
   return list;
 }

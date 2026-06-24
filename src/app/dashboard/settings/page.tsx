@@ -3,7 +3,6 @@ import { GmailConnect } from "@/components/dashboard/GmailConnect";
 import { SignatureEditor } from "@/components/dashboard/SignatureEditor";
 import { CategoryEditor } from "@/components/dashboard/CategoryEditor";
 import { ContractorsEditor } from "@/components/dashboard/ContractorsEditor";
-import { RoutingCategoryEditor } from "@/components/dashboard/RoutingCategoryEditor";
 
 export default function SettingsPage() {
   return (
@@ -31,8 +30,6 @@ export default function SettingsPage() {
       <CategoryEditor />
 
       <ContractorsEditor />
-
-      <RoutingCategoryEditor />
     </div>
   );
 }
