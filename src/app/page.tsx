@@ -40,9 +40,9 @@ export default function HomePage() {
           AI-driven ärendehantering för fastighetsbolag
         </p>
         <p className="mb-8 max-w-xl text-lg text-gray-500">
-          Hyresgäster mailar er vanliga felanmälningsadress. BoDesk tar emot
-          inkommande ärenden, klassificerar dem med AI och hjälper handläggaren
-          samla in rätt information.
+          Hyresgästen hör av sig som vanligt — Bo tar hand om resten.
+          Ärendet skapas, klassificeras och rätt information samlas in automatiskt.
+          Du granskar, godkänner och servicepersonalen kontaktas.
         </p>
         <Link
           href="/login"
