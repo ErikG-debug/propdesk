@@ -106,12 +106,6 @@ export default function CaseDetailPage() {
   // Reset confirm step when tab or reply changes
   useEffect(() => { setConfirmStep(false); }, [activeTab, reply]);
 
-  // Scrolla till senaste meddelandet när konversationen uppdateras
-  useEffect(() => {
-    const el = document.getElementById("thread-bottom");
-    el?.scrollIntoView({ behavior: "smooth" });
-  }, [residentMessages.length, activeTab]);
-
   const isReallyClosed =
     closedIds.has(caseId) ||
     caseData?.status === "CLOSED" ||
@@ -138,6 +132,12 @@ export default function CaseDetailPage() {
       })),
     [caseData],
   );
+
+  // Scrolla till senaste meddelandet när konversationen uppdateras
+  useEffect(() => {
+    const el = document.getElementById("thread-bottom");
+    el?.scrollIntoView({ behavior: "smooth" });
+  }, [residentMessages.length, activeTab]);
 
   if (loading) return <div className="py-20 text-center text-gray-400">Laddar ärende…</div>;
   if (!caseData) return <div className="py-20 text-center text-gray-500">Ärendet hittades inte.</div>;
